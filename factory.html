@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>factory</title>
+</head>
+<body>
+	<script>
+
+var BicycleShop = function(){
+	this.say = function(){
+		console.log('a')
+	}
+}
+BicycleShop.prototype = {
+	sellBicycle:function(mode){
+		var bicycle = this.createBicycle(mode);
+		
+		return bicycle;
+	},
+	createBicycle: function(model) {
+    throw new Error('Unsupported operation on an abstract class.');
+  }
+}
+function extend(sonClass,superClass){  
+	console.log(typeof superClass)
+        if(typeof superClass === 'function'){//类式继承  
+            var F = function(){}; //创建一个中间函数对象以获取父类的原型对象  
+            F.prototype = superClass.prototype; //设置原型对象  
+            sonClass.prototype = new F(); //实例化F, 继承父类的原型中的属性和方法，而无需调用父类的构造函数实例化无关的父类成员  
+            sonClass.prototype.constructor = sonClass; //设置构造函数指向自己  
+            sonClass.superClass = superClass; //同时，添加一个指向父类构造函数的引用，方便调用父类方法或者调用父类构造函数  
+        } else if(typeof superClass === 'object'){ //方法的扩充  
+            var pro = sonClass.prototype;  
+            for(var k in superClass){  
+                if(!pro[k]){ //如果原型对象不存在这个属性，则复制  
+                    pro[k] = superClass[k];  
+                }  
+            }  
+        } else {  
+            throw new Error('fatal error:"Function.prototype.extend" expects a function or object');  
+        }  
+          
+        return sonClass;  
+    }; 
+
+var AcmeBicycleShop = function(){}
+extend(AcmeBicycleShop,BicycleShop);
+AcmeBicycleShop.prototype.createBicycle = function(mode) {
+	switch(mode) {
+			case 'The AmcSpeedster':
+				return new AmcSpeedster();
+				break;
+
+			case 'The AmcLowrider':
+				return new AmcLowrider();
+				break;
+
+			case 'The AmcFlatlander':
+				return new AmcFlatlander();
+				break;
+	}
+}
+var AmcSpeedster = function(){}
+AmcSpeedster.prototype = {
+	wash:function(){},
+	assemble: function() {},
+	ride: function() {},
+	repair: function() {}
+}
+
+var AmcLowrider = function(){}
+AmcLowrider.prototype = {
+	wash:function(){},
+	assemble: function() {},
+	ride: function() {},
+	repair: function() {}
+}
+
+var AmcFlatlander = function(){}
+AmcFlatlander.prototype = {
+	wash:function(){},
+	assemble: function() {},
+	ride: function() {},
+	repair: function() {}
+}
+
+var alecsCruisers = new AcmeBicycleShop();
+var yourNewBike = alecsCruisers.sellBicycle('The AmcLowrider');
+	console.log(yourNewBike)
+</script>
+
+</body>
+</html>

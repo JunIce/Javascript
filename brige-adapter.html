@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>brige</title>
+</head>
+<body>
+	<script>
+	var asyncRequest = (function(){
+		function readyState(o,callback){
+			o.onreadystatechange = function(){
+				if(o.readyState == 4){
+					callback(o)
+				}	
+			}
+		}
+		var xhr = new XMLHttpRequest();
+		return function(options){
+			var defaultOptions = {
+				url:false,
+				type:'GET',
+				data:null,
+				success:false,
+				complete:false
+			};
+			for(var i in options){
+				if(options[i] === undefined){
+					options[i] == defaultOptions[i];
+				}
+			}
+			var http = xhr;
+			xhr.open(options.type,options.url);
+			readyState(http,options.success);
+			http.send(options.data);
+			return http;
+		}
+	})();
+
+	
+
+Function.prototype.method = function(name,fn){
+	this.prototype[name] = fn;
+	return this;
+}
+
+if(!Array.prototype.forEach){
+	Array.method('forEach',function(fn,obj){
+		var obj = obj || window;
+		for(var i = 0; i < this.length; i++){
+			fn.call(obj,this[i],i,this);
+		}
+	})
+}
+
+if(!Array.prototype.filter){
+	Array.method('filter',function(fn,obj){
+		var obj = obj || window;
+		var a = [];
+		for(var i = 0; i< this.length; i++){
+			if(!fn.call(obj,this[i],i,this)){
+				continue;
+			}
+			a.push(this[i]);
+		}
+		return a;
+	})
+}
+window.DED = window.DED || {};
+DED.Observer = function(){
+	this.fns = [];
+}
+
+DED.Observer.prototype = {
+	subscribe:function(fn){
+		this.fns.push(fn);
+	},
+	unsubscribe:function(fn){
+		this.fns.filter(function(el){
+			if(el !== fn){
+				return el;
+			}
+		})
+	},
+	fire:function(o){
+		this.fns.forEach(function(el){
+			el(o);
+		});
+	}
+};
+
+DED.Queue = function(){
+	 this.queue = [];
+};
+
+DED.Queue.method('add',function(o){
+	this.queue.push(o);
+}).
+method('dequeue',function(){
+	this.queue.pop();
+}).
+method('flush',function(){
+	asyncRequest(this.queue[0]);
+})
+
+var q = new DED.Queue;
+q.add({
+	url:'123.php?id=1',
+	type:'GET',
+	success:function(data){
+		console.log(data.responseText)
+	}
+});
+q.add({
+	url:'123.php?id=2',
+	type:'GET',
+	success:function(data){
+		console.log(data.responseText)
+	}
+});
+//q.flush()
+q.dequeue()
+q.flush()
+</script>
+</body>
+</html>

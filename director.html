@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>director</title>
+</head>
+<body>
+	<script>
+Function.prototype.extend = function(superClass){  
+        if(typeof superClass === 'function'){//类式继承  
+            var F = function(){}; //创建一个中间函数对象以获取父类的原型对象  
+            F.prototype = superClass.prototype; //设置原型对象  
+            this.prototype = new F(); //实例化F, 继承父类的原型中的属性和方法，而无需调用父类的构造函数实例化无关的父类成员  
+            this.prototype.constructor = this; //设置构造函数指向自己  
+            this.superClass = superClass; //同时，添加一个指向父类构造函数的引用，方便调用父类方法或者调用父类构造函数  
+        } else if(typeof superClass === 'object'){ //方法的扩充  
+            var pro = this.prototype;  
+            for(var k in superClass){  
+                if(!pro[k]){ //如果原型对象不存在这个属性，则复制  
+                    pro[k] = superClass[k];  
+                }  
+            }  
+        } else {  
+            throw new Error('fatal error:"Function.prototype.extend" expects a function or object');  
+        }  
+          
+        return this;  
+    };    
+var Interface = function (name, methods) {
+        if (arguments.length != 2) {
+            throw new Error("Interface constructor called with " + arguments.length + "arguments, but expected exactly 2.");
+        }
+        this.name = name;
+        this.methods = [];
+        for (var i = 0, len = methods.length; i < len; i++) {
+            if (typeof methods[i] !== 'string') {
+                throw new Error("Interface constructor expects method names to be " + "passed in as a string.");
+            }
+            this.methods.push(methods[i]);
+        }
+    };
+// Static class method.
+Interface.ensureImplements = function (object) {
+    if (arguments.length < 2) {
+        throw new Error("Function Interface.ensureImplements called with " + arguments.length + "arguments, but expected at least 2.");
+    }
+    for (var i = 1, len = arguments.length; i < len; i++) {
+        var interface = arguments[i];
+        if (interface.constructor !== Interface) {
+            throw new Error("Function Interface.ensureImplements expects arguments" + "two and above to be instances of Interface.");
+        }
+        for (var j = 0, methodsLen = interface.methods.length; j < methodsLen; j++) {
+            var method = interface.methods[j];
+            if (!object[method] || typeof object[method] !== 'function') {
+                throw new Error("Function Interface.ensureImplements: object " + "does not implement the " + interface.name + " interface. Method " + method + " was not found.");
+            }
+        }
+    }
+};
+
+
+var Bicycle = new Interface('Bicycle', ['assemble', 'wash', 'ride', 'repair', 
+    'getPrice']);
+
+var BicycleDecorator = function(bicycle) { // implements Bicycle
+  Interface.ensureImplements(bicycle, Bicycle);
+  this.bicycle = bicycle;
+}
+BicycleDecorator.prototype = {
+  assemble: function() {
+    return this.bicycle.assemble();
+  },
+  wash: function() {
+    return this.bicycle.wash();
+  },
+  ride: function() {
+    return this.bicycle.ride();
+  },
+  repair: function() {
+    return this.bicycle.repair();
+  },
+  getPrice: function() {
+    return this.bicycle.getPrice();
+  }
+};
+
+var FrameColorDecorator = function(bicycle, frameColor) { // implements Bicycle
+   BicycleDecorator.call(this,bicycle); // Call the superclass's constructor.
+  this.frameColor = frameColor;
+}
+FrameColorDecorator.extend(BicycleDecorator); // Extend the superclass.
+FrameColorDecorator.prototype.assemble = function() {
+  return 'Paint the frame ' + this.frameColor + ' and allow it to dry. ' + 
+      this.bicycle.assemble();
+};
+var HeadlightDecorator = function(bicycle) 
+{ // implements Bicycle
+  BicycleDecorator.call(this,bicycle)
+
+	// console.log(this.superclass)
+ //  this.superclass.constructor(bicycle); // Call the superclass's constructor.
+}
+HeadlightDecorator.extend(BicycleDecorator); // Extend the superclass.
+HeadlightDecorator.prototype.assemble = function() {
+  return this.bicycle.assemble() + ' Attach headlight to handlebars.';
+};
+HeadlightDecorator.prototype.getPrice = function() {
+  return this.bicycle.getPrice() + 15.00;
+};
+
+var TaillightDecorator = function(bicycle) { // implements Bicycle
+	//console.log(this.superclass)
+  BicycleDecorator.call(this,bicycle)
+ // this.superclass.constructor(bicycle); // Call the superclass's constructor.
+}
+TaillightDecorator.extend(BicycleDecorator); // Extend the superclass.
+TaillightDecorator.prototype.assemble = function() {
+  return this.bicycle.assemble() + ' Attach taillight to the seat post.';
+};
+TaillightDecorator.prototype.getPrice = function() {
+  return this.bicycle.getPrice() + 9.00;
+};
+
+
+
+var AcmeComfortCruiser = function() { // implements Bicycle
+  //todo
+};
+AcmeComfortCruiser.prototype = {
+  assemble: function() {
+    //todo
+  },
+  wash: function() {
+    //todo
+  },
+  ride: function() {
+    //todo
+  },
+  repair: function() {
+    //todo
+  },
+  getPrice: function() {
+    return 399.00;
+  }
+};
+
+var myBicycle = new AcmeComfortCruiser(); // Instantiate the bicycle.
+console.log(myBicycle.getPrice()); // Returns 399.00
+myBicycle = new FrameColorDecorator(myBicycle, 'red');
+myBicycle = new TaillightDecorator(myBicycle); // Decorate the bicycle object
+                                               // with a taillight.
+console.log(myBicycle.getPrice()); // Now returns 408.00
+
+myBicycle = new HeadlightDecorator(myBicycle); // Decorate the bicycle object
+myBicycle = new HeadlightDecorator(myBicycle); // Decorate the bicycle object
+ console.log(myBicycle.assemble())                                              // again, now with a headlight.
+console.log(myBicycle.getPrice()); // Now returns 423.00
+	</script>
+</body>
+</html>

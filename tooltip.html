@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>tooltip</title>
+	<style>
+	#tag{width: 100px;height: 100px;background: #ccc}
+	</style>
+</head>
+<body>
+<div id="tag"></div>
+	<script>
+var TooltipManager = (function(){
+
+var Tooltip = function(){
+	this.element = document.createElement('div');
+	this.element.style.display = 'none';  
+  	this.element.style.position = 'absolute';    
+  	this.element.className = 'tooltip';
+  	document.getElementsByTagName('body')[0].appendChild(this.element);
+}
+Tooltip.prototype = {
+	startDelay: function(e, text) {
+      var x = e.clientX;
+      var y = e.clientY;
+      this.show(x,y,text)
+ 	},
+	show:function(x,y,text) {
+		this.element.innerHTML = text;
+	    this.element.style.left = (x) + 'px';    
+	    this.element.style.top = (y + 20) + 'px';
+	    this.element.style.display = 'block';    
+	},
+	hide:function(){
+		this.element.style.display = 'none';
+	}
+}
+
+function addEvent(el,type,fn) {
+	return addEventListener ? el.addEventListener(type,fn,false):'';
+}
+
+	return {
+		addTooltip : function(targetElement,text){
+			var tt = new Tooltip();
+	      addEvent(targetElement, 'mouseover', function(e) { tt.startDelay(e,text)});
+	      addEvent(targetElement, 'mouseout', function(e) { tt.hide(); });  
+			},
+	}
+})();
+
+
+var a = document.getElementById('tag');
+TooltipManager.addTooltip(a,'1233221')
+</script>
+
+</body>
+</html>

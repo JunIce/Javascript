@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>对象拷贝</title>
+</head>
+<body>
+	<script>
+	//浅拷贝
+	var obj = {
+		a:10,
+		c:{
+			ac:1,
+			bc:2
+		}
+	};
+
+	function copy(obj){
+		var obj_new = {};
+
+		for(var i in obj){
+			obj_new[i] = obj[i]
+		}
+
+		return obj_new;
+	}
+
+	// var obj2 = copy(obj);
+	// obj2.a = 20;
+	// obj2.c.ac = 20;
+
+	
+	console.log(obj.c.ac)
+
+	//深拷贝
+	
+	function deep_copy(obj){
+		var obj_new = {};
+		if(typeof obj !== 'object'){
+			return obj;
+		}
+		for(var i in obj){
+			obj_new[i] = deep_copy(obj[i])
+		}
+		return obj_new;
+	}
+
+	var obj3 = deep_copy(obj);
+	obj3.c.ac = 20;
+	console.log(obj3.c.ac)
+
+	console.log(obj.c.ac)
+	
+	</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<div id="a"></div>
+	<div id="b"></div>
+	<div id="c"></div>
+	<script>
+function setStyle(elements, prop, val) {
+for (var i = 0, len = elements.length; i < len; i++) {
+document.getElementById(elements[i]).style[prop] = val;
+}
+}
+	function setCSS(el,props){
+		for(var i in props){
+			 setStyle(el, i, props[i]);
+		}
+	}
+	setCSS(['a','b','c'],{
+		width:'100px',
+		height:'100px',
+		background:'red',
+		marginTop:'10px'
+	})
+	</script>
+</body>
+</html>

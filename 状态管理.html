@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+var StateManager = function(){
+  var currState = 'wait';
+  var states = {
+    jump: function( state ){
+    },
+    wait: function( state ){
+    },
+    attack: function( state ){
+    },
+    crouch: function( state ){
+    },
+    defense: function( state ){
+      if ( currState === 'jump'  ){
+          return false;  
+      }
+    	currState = 'defense'; //  切换状态
+    	console.log(currState)
+    }
+  };
+  var changeState = function( state ){
+    states[ state ] && states[ state ]();
+  }
+  return {
+      changeState  : changeState
+  }
+};
+var stateManager = StateManager();
+var a = stateManager.changeState( 'defense' );
+//console.log(a)
+	</script>
+</body>
+</html>

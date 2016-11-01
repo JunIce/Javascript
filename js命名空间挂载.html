@@ -1,0 +1,28 @@
+ //js 命名空间挂载方式
+ <script type="text/javascript">
+        var myApp = myApp || {};
+        myApp.untils = {};
+        (function(){
+            var value = 5;
+            this.getValue = function(){
+                return value;
+            }
+
+            this.setValue = function(newval){
+                this.value = newval;
+            }
+
+            this.tools = {}
+        }).apply(myApp);
+
+        (function(){
+            this.arg = function(){
+                console.log('ad')
+            }
+        }).apply(myApp.tools);
+        console.log(myApp)
+    </script>
+
+
+
+

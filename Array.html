@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>observer</title>
+</head>
+<body>
+	<script>
+Array.prototype.filtered = function(fn){
+	if(typeof fn !== 'function') throw new Error('not function');
+
+	var len = this.length;
+	var res = [];
+	var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
+	for(var i=0; i < len; i++) {
+		var arg = this[i];
+		if(fn.call(thisArg,arg,i,this)) {
+			res.push(this[i])
+		}
+	}
+	return res;
+}
+Array.prototype.some = function(fn){
+	if(typeof fn !== 'function') throw new Error('not function');
+
+	var len = this.length;
+	var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
+	for(var i=0; i < len; i++) {
+		if (i in this && fn.call(thisArg, this[i], i, this))
+    	return true;
+	}
+	return false;
+}
+
+Array.prototype.each = function(fn){
+	if(typeof fn !== 'function') throw new Error('not function');
+
+	var len = this.length;
+	var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
+	for(var i=0; i < len; i++) {
+		if (i in this && fn.call(thisArg, this[i], i, this))
+    	return false;
+	}
+	return true;
+}
+Array.prototype.forEach = function(fn){
+	if(typeof fn !== 'function')  throw new Error('not function');
+	var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
+
+	var len = this.length;
+	var k = 0;
+	while (k < len) {  
+        var kValue;  
+        if (k in this) {  
+            kValue = this[k];  
+            fn.call(thisArg, kValue, k, this);  
+        }  
+        k++;  
+    }  
+}
+function say(num) {
+	return num > 4;
+}
+function moreBig(num) {
+	return num > 4;
+}
+console.log([1,2,3].each(say))
+
+</script>
+</body>
+</html>

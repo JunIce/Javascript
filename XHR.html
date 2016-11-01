@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+	<script>
+var SimpleHandler = function(){};
+SimpleHandler.prototype = {
+	request:function(type,url,callback,postVars) {
+		var xhr = this.createXhrObject();
+			xhr.open(type,url);
+		xhr.onreadystatechange = function(){
+				if(xhr.readyState == 4){
+					var result,state = xhr.status;
+
+					if(state >= 200 && state < 300){
+						result = xhr.responseText;
+						
+						callback.success(result)
+					}else{
+						callback.failure(xhr.status)
+					}
+				}
+			}
+		xhr.send(postVars ? postVars : null);
+		//debugger;
+	},
+	createXhrObject:function(){
+		return new XMLHttpRequest();
+	}
+}
+
+var a = new SimpleHandler();
+var callback = {
+	success:function(data){
+		console.log(data);
+	},
+	failure:function(data) {
+		console.log(data)
+	}
+}
+			
+a.request('GET','11.php',callback,null)
+	</script>
+</body>
+</html>

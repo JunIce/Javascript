@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+var Interface = function (name, methods) {
+        if (arguments.length != 2) {
+            throw new Error("Interface constructor called with " + arguments.length + "arguments, but expected exactly 2.");
+        }
+        this.name = name;
+        this.methods = [];
+        for (var i = 0, len = methods.length; i < len; i++) {
+            if (typeof methods[i] !== 'string') {
+                throw new Error("Interface constructor expects method names to be " + "passed in as a string.");
+            }
+            this.methods.push(methods[i]);
+        }
+    };
+// Static class method.
+Interface.ensureImplements = function (object) {
+    if (arguments.length < 2) {
+        throw new Error("Function Interface.ensureImplements called with " + arguments.length + "arguments, but expected at least 2.");
+    }
+    for (var i = 1, len = arguments.length; i < len; i++) {
+        var interface = arguments[i];
+        if (interface.constructor !== Interface) {
+            throw new Error("Function Interface.ensureImplements expects arguments" + "two and above to be instances of Interface.");
+        }
+        for (var j = 0, methodsLen = interface.methods.length; j < methodsLen; j++) {
+            var method = interface.methods[j];
+            if (!object[method] || typeof object[method] !== 'function') {
+                throw new Error("Function Interface.ensureImplements: object " + "does not implement the " + interface.name + " interface. Method " + method + " was not found.");
+            }
+        }
+    }
+};
+
+var Composite = new Interface('Composite', ['add', 'remove', 'getChild']);
+var GalleryItem = new Interface('GalleryItem', ['hide', 'show']);
+
+var bd = document.getElementsByTagName('body')[0];
+
+// DynamicGallery class.
+// 创建动态图片库类
+var DynamicGallery = function(id) { // implements Composite, GalleryItem
+  this.children = [];
+
+  this.element = document.createElement('div');
+  this.element.id = id;
+  this.element.className = 'dynamic-gallery';
+
+  bd.appendChild(this.element)
+}
+
+DynamicGallery.prototype = {
+
+  // Implement the Composite interface.
+  // 添加子元素
+  add: function(child) {
+    Interface.ensureImplements(child, Composite, GalleryItem);
+    this.children.push(child);
+    this.element.appendChild(child.getElement());
+  },
+  // 移除子元素
+  remove: function(child) {
+    for(var node, i = 0; node = this.getChild(i); i++) {
+      if(node == child) {
+        this.formComponents[i].splice(i, 1);
+        break;
+      }
+    }
+    this.element.removeChild(child.getElement());
+  },
+  // 获取子元素
+  getChild: function(i) {
+    return this.children[i];
+  },
+
+  // Implement the GalleryItem interface.
+  // 隐藏该图片库的所有子元素
+  hide: function() {
+    for(var node, i = 0; node = this.getChild(i); i++) {
+      node.hide();
+    }
+    this.element.style.display = 'none';
+  },
+  // 显示该图片库的所有子元素
+  show: function() {
+    this.element.style.display = 'block';
+    for(var node, i = 0; node = this.getChild(i); i++) {
+      node.show();
+    }    
+  },
+  
+  // Helper methods.
+  // 获取图片库的dom节点
+  getElement: function() {
+    return this.element;
+  }
+};
+
+// GalleryImage class.
+// 图片类
+var GalleryImage = function(src) { // implements Composite, GalleryItem
+  this.element = document.createElement('img');
+  this.element.className = 'gallery-image';
+  this.element.src = src;
+}
+
+GalleryImage.prototype = {
+
+  // Implement the Composite interface.
+
+  add: function() {},       // This is a leaf node, so we don't
+  remove: function() {},    // implement these methods, we just
+  getChild: function() {},  // define them.
+
+  // Implement the GalleryItem interface.
+  
+  hide: function() {
+    this.element.style.display = 'none';
+  },
+  show: function() {
+    this.element.style.display = ''; // Restore the display attribute to its 
+                                     // previous setting.
+  },
+  
+  // Helper methods.
+  
+  getElement: function() {
+    return this.element;
+  }
+};
+
+// Usage.
+
+var topGallery = new DynamicGallery('top-gallery');
+
+topGallery.add(new GalleryImage('../../images/dislike.png'));
+
+var vacationPhotos = new DynamicGallery('vacation-photos');
+
+
+vacationPhotos.add(new GalleryImage('../../images/like.png'));
+
+
+topGallery.add(vacationPhotos);
+topGallery.show();
+vacationPhotos.hide(); 
+	</script>
+</body>
+</html>

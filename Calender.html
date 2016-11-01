@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>flyweight</title>
+	<style>
+	li{display: inline-block;margin-right: 10px;background: #F6ADAD}
+	</style>
+</head>
+<body>
+<div id="calendar"></div>
+	<script>
+var CalendarYear = function(year,parent) {
+	this.year = year;
+	this.element = document.createElement('div');
+	this.element.id = 'year';
+	parent.appendChild(this.element);
+
+	this.months = [];
+	this.dayNum = [31, isLeapYear(this.year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; 
+	function isLeapYear(year){
+		return year > 0 && !(year%4) && (year%100 || !(year%400))
+	}
+	for(var i = 0; i < 12; i++){
+		this.months[i] = new CalendarMonth(i,this.dayNum[i],this.element);
+	}
+}
+
+CalendarYear.prototype.display = function(){
+	for(var i = 0; i < this.months.length; i++){
+		
+		this.months[i].display();
+	}
+	//this.element.style.display = 'block';
+}
+
+var CalendarDay = function(){};
+CalendarDay.prototype.display = function(date,parent){
+		var element = document.createElement('li');
+		parent.appendChild(element)
+		element.innerHTML = date;
+	}
+
+
+var calendarDay = new CalendarDay();
+
+var CalendarMonth = function(i,dayNum,parent){
+	
+	this.monthNum = i;
+	this.dayNum = dayNum;
+
+	this.element = document.createElement('ul');
+	this.element.id = 'month-'+(i+1);
+	parent.appendChild(this.element);
+
+	this.days=[];
+	for(var i = 1; i <= dayNum; i++){
+		this.days[i] = calendarDay;
+	}
+}
+
+CalendarMonth.prototype.display = function(){
+	for(var i = 1, len = this.days.length; i < len; i++) {		
+		this.days[i].display(i, this.element); 
+	}
+	 this.element.style.display = 'block';
+}
+var div  = document.getElementById('calendar')
+var a = new CalendarYear(2000,div)
+
+a.display()
+
+	</script>
+</body>
+</html>

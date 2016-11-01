@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>email</title>
+	<style>
+	
+	</style>
+</head>
+<body>
+	<ul>
+		<li class="a"><a href="#" id="1" type="a">message1</a></li>
+		<li class="a"><a href="#" id="2" type="a">message2</a></li>
+		<li class="a"><a href="#" id="3" type="a">message3</a></li>
+	</ul>
+	<div id="email"></div>
+	<script>
+	var DED = {};
+	DED.utils = {
+		ajax:function(options){
+			var defaultOptions = {
+				url:false,
+				type:'GET',
+				data:false,
+				success:false,
+				complete:false
+			};
+			
+			for(var i in options){
+				if(options[i] == 'undefined'){
+					options[i] = defaultOptions[i]
+				}
+			}
+			
+			var xhr = new XMLHttpRequest();
+			xhr.open(options.type,options.url);
+
+			xhr.onreadystatechange = function(){
+				if(xhr.readyState == 4){
+					var result,state = xhr.status;
+
+					if(state >= 200 && state < 300){
+						result = xhr.responseText;
+						
+						getSuccess(result,xhr)
+					}else{
+						console.log('ERR',xhr.status);
+					}
+				}
+			}
+
+			xhr.send(options.data ? options.data : null);
+			function getSuccess(result,xhr){
+				options.success && options.success(result,options,xhr)
+			}
+			
+		}
+	}
+
+	var dedMail = (function(){
+		function mailReq(id,type,callback){
+			var options = {
+				url:'123.php?id=' + id + '&type=' + type,
+				type:'GET',
+				success:callback
+			}
+			DED.utils.ajax(options)
+		}
+		return {
+			getMail:function(id,type,callback){
+				mailReq(id,type,callback);
+			}
+		}
+	})();
+
+	function addEvent(el,type,fn){
+		return  addEventListener ? el.addEventListener(type,fn,false):'';
+	}
+
+	var ul = document.getElementsByTagName('ul')[0];
+
+	function eventHandler(e){
+		var e = e || window.event;
+		var target = e.target || e.srcElement;
+		if(target.tagName === 'A'){
+		var email = document.getElementById('email');
+		var details = '';
+		dedMail.getMail(target.id,target.type,function(data){
+			var obj = eval('(' + data + ')');
+		 	details =  '<p><strong>ID:</strong> '+ obj.id +'<br>';
+            details += '<strong>JOB:</strong> '+ obj.job +'</p>';
+            details += '<p><strong>MESSAGE:</strong><br>';
+            details += ''+ obj.email +'</p>';
+
+            email.innerHTML = details;
+		})
+		}else{
+			e.stopPropagation();
+		}
+	}
+	
+	addEvent(ul,'click',function(){
+			eventHandler(event);
+	},false)
+	
+	</script>
+</body>
+</html>
